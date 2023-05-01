@@ -1,0 +1,19 @@
+{
+  "name": "everscale-graphql-examples",
+  "version": "0.1.0",
+  "description": "Everscale GraphQL code generation guide",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "tsc --build --clean"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "@eversdk/core": "^1.42.1",
+    "@eversdk/lib-node": "^1.42.1",
+    "axios": "^1.4.0"
+  }
+}
