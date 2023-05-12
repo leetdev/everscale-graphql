@@ -1,4 +1,5 @@
 import axios from 'axios'
+import {BlockchainMessage} from './generated/graphql'
 
 // configure your credentials here
 const PROJECT_ID = ''
@@ -14,26 +15,24 @@ if (PROJECT_SECRET) {
   }
 }
 
-(async () => {
-  try {
-    const query = `
-      query {
-        messages(
-          filter: {
-            dst: {
-              eq: "${ACCOUNT_ADDRESS}"
-            }
+try {
+  const query = `
+    query {
+      messages(
+        filter: {
+          dst: {
+            eq: "${ACCOUNT_ADDRESS}"
           }
-        ) {
-          id
-          src
-          value(format: DEC)
         }
-      }`
-    const {data} = await axios.post('', {query})
-    // do something with the data.data.messages array
-    console.log(data.data.messages)
-  } catch (error) {
-    console.error(error)
-  }
-})()
+      ) {
+        id
+        src
+        value(format: DEC)
+      }
+    }`
+  const {data} = await axios.post('', {query})
+  const messages: BlockchainMessage[] = data.data.messages
+  console.log(messages)
+} catch (error) {
+  console.error(error)
+}

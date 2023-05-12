@@ -1,4 +1,5 @@
 import axios from 'axios'
+import {BlockchainQuery} from './generated/graphql'
 
 // configure your credentials here
 const PROJECT_ID = ''
@@ -29,7 +30,8 @@ if (PROJECT_SECRET) {
         }
       }`
     const {data} = await axios.post('', {query})
-    console.log(`The account balance is ${data.data.blockchain.account.info.balance / 10 ** 9}`)
+    const blockchain: BlockchainQuery = data.data.blockchain
+    console.log(`The account balance is ${blockchain.account.info.balance / 10**9}`)
   } catch (error) {
     console.error(error)
   }

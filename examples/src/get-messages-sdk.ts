@@ -1,5 +1,6 @@
 import {TonClient} from '@eversdk/core'
 import {libNode} from '@eversdk/lib-node'
+import {BlockchainMessage} from './generated/graphql'
 
 // configure your credentials here
 const PROJECT_ID = ''
@@ -15,27 +16,25 @@ const client = new TonClient({
     },
   })
 
-;(async () => {
-  try {
-    const query = `
-      query {
-        messages(
-          filter: {
-            dst: {
-              eq: "${ACCOUNT_ADDRESS}"
-            }
+try {
+  const query = `
+    query {
+      messages(
+        filter: {
+          dst: {
+            eq: "${ACCOUNT_ADDRESS}"
           }
-        ) {
-          id
-          src
-          value(format: DEC)
         }
-      }`
-    const {result} = await client.net.query({query})
-    // do something with result.data.messages array
-    console.log(result.data.messages)
-    client.close()
-  } catch (error) {
-    console.error(error)
-  }
-})()
+      ) {
+        id
+        src
+        value(format: DEC)
+      }
+    }`
+  const {result} = await client.net.query({query})
+  const messages: BlockchainMessage[] = result.data.messages
+  console.log(messages)
+  client.close()
+} catch (error) {
+  console.error(error)
+}
