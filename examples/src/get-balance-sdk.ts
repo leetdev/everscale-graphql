@@ -16,8 +16,9 @@ const client = new TonClient({
   },
 })
 
-try {
-  const query = `
+async function main() {
+  try {
+    const query = `
     query {
       blockchain {
         account(
@@ -29,10 +30,13 @@ try {
         }
       }
     }`
-  const {result} = await client.net.query({query})
-  const blockchain: BlockchainQuery = result.data.blockchain
-  console.log(`The account balance is ${blockchain.account.info.balance / 10**9}`)
-  client.close()
-} catch (error) {
-  console.error(error)
+    const {result} = await client.net.query({query})
+    const blockchain: BlockchainQuery = result.data.blockchain
+    console.log(`The account balance is ${parseInt(blockchain.account?.info?.balance || '0', 10) / 10 ** 9}`)
+    client.close()
+  } catch (error) {
+    console.error(error)
+  }
 }
+
+main()

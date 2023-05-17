@@ -22,8 +22,9 @@ interface MyQuery {
   seq_no: number
 }
 
-try {
-  const query = `
+async function main() {
+  try {
+    const query = `
     query MyQuery($address: String!, $cursor: String, $count: Int, $seq_no: Int){
       blockchain {
         account(address: $address){
@@ -47,24 +48,28 @@ try {
         }
       }
     }`
-  const variables: MyQuery = {
-    address: ACCOUNT_ADDRESS,
-    cursor: null,
-    count: 10, // number per page, max: 50
-    seq_no: 1, // set to the initial block sequence number
+    const variables: MyQuery = {
+      address: ACCOUNT_ADDRESS,
+      cursor: null,
+      count: 10, // number per page, max: 50
+      seq_no: 1, // set to the initial block sequence number
+    }
+    while (true) { // infinity loop, implement exit condition here
+      const {data} = await axios.post('', {query, variables})
+      const result: BlockchainQuery = data.data
+      const messages = result.account?.messages
+      const edges = messages?.edges || []
+      variables.cursor = messages?.pageInfo.endCursor || variables.cursor
+      edges.forEach(edge => {
+        const message = edge.node
+        // do something with message
+        console.log(message)
+      })
+      // implement a delay here so as not to spam the API
+    }
+  } catch (error) {
+    console.error(error)
   }
-  while (true) { // infinity loop, implement exit condition here
-    const {data} = await axios.post('', {query, variables})
-    const result: BlockchainQuery = data.data
-    const messages = result.account.messages
-    variables.cursor = messages.pageInfo.endCursor || variables.cursor
-    messages.edges.forEach(edge => {
-      const message = edge.node
-      // do something with message
-      console.log(message)
-    })
-    // implement a delay here so as not to spam the API
-  }
-} catch (error) {
-  console.error(error)
 }
+
+main()

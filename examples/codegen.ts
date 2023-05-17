@@ -2,7 +2,7 @@ import type {CodegenConfig} from '@graphql-codegen/cli'
 
 // configure your credentials here
 const PROJECT_ID = ''
-const PROJECT_SECRET = ''
+const PROJECT_HTTP_AUTHORIZATION = ''
 
 const schemaUrl = `https://mainnet.evercloud.dev/${PROJECT_ID}/graphql`
 
@@ -12,7 +12,7 @@ const config: CodegenConfig = {
     {
       [schemaUrl]: {
         headers: {
-          Authorization: `Basic ${PROJECT_SECRET}`,
+          Authorization: PROJECT_HTTP_AUTHORIZATION,
         },
       },
     },

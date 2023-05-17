@@ -15,7 +15,7 @@ if (PROJECT_SECRET) {
   }
 }
 
-(async () => {
+async function main() {
   try {
     const query = `
       query {
@@ -31,8 +31,10 @@ if (PROJECT_SECRET) {
       }`
     const {data} = await axios.post('', {query})
     const blockchain: BlockchainQuery = data.data.blockchain
-    console.log(`The account balance is ${blockchain.account.info.balance / 10**9}`)
+    console.log(`The account balance is ${parseInt(blockchain.account?.info?.balance || '0', 10) / 10**9}`)
   } catch (error) {
     console.error(error)
   }
-})()
+}
+
+main()
