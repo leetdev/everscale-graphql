@@ -1,6 +1,6 @@
 import {TonClient} from '@eversdk/core'
 import {libNode} from '@eversdk/lib-node'
-import {BlockchainMessage} from './generated/graphql'
+import {BlockchainQuery} from './generated/graphql'
 
 // configure your credentials here
 const PROJECT_ID = ''
@@ -16,24 +16,57 @@ const client = new TonClient({
     },
   })
 
+interface MyQuery {
+  address: string
+  cursor: string | null
+  count: number
+  seq_no: number
+}
+
 try {
   const query = `
-    query {
-      messages(
-        filter: {
-          dst: {
-            eq: "${ACCOUNT_ADDRESS}"
+    query MyQuery($address: String!, $cursor: String, $count: Int, $seq_no: Int){
+      blockchain {
+        account(address: $address){
+          messages(
+            msg_type: ExtIn
+            master_seq_no_range: {
+              start: $seq_no
+            }
+            first: $count
+            after: $cursor
+          ){
+            edges{
+              node{
+                hash
+                msg_type
+                value(format: DEC)
+                src
+              }
+            }
           }
         }
-      ) {
-        id
-        src
-        value(format: DEC)
       }
     }`
-  const {result} = await client.net.query({query})
-  const messages: BlockchainMessage[] = result.data.messages
-  console.log(messages)
+  const variables: MyQuery = {
+    address: ACCOUNT_ADDRESS,
+    cursor: null,
+    count: 10, // number per page, max: 50
+    seq_no: 1, // set to the initial block sequence number
+  }
+  while (true) { // infinity loop, implement exit condition here
+    const {result} = await client.net.query({query, variables})
+    const data: BlockchainQuery = result.data
+    const messages = data.account.messages
+    variables.cursor = messages.pageInfo.endCursor || variables.cursor
+    messages.edges.forEach(edge => {
+      const message = edge.node
+      // do something with message
+      console.log(message)
+    })
+    // implement a delay here so as not to spam the API
+  }
+
   client.close()
 } catch (error) {
   console.error(error)
